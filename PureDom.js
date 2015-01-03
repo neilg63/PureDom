@@ -66,6 +66,10 @@ String.prototype.segment = function(index,separator) {
 	return segment;
 }
 
+String.prototype.sanitize = function(separator) {
+	return this.replace(/[^0-9a-z]+/gi,separator).replace(/[^0-9a-z]+$/i,'');
+}
+
 String.prototype.numberStrings = function() {
 	return this.replace(/[^0-9.-]+/g,' ').trim().split(' ');
 }
@@ -204,8 +208,8 @@ HTMLElement.prototype._pend = function(node,type) {
 	if (typeof node == 'string') {
 		node = document.createTextNode(node);
 	}
-	if (type == 'pre') {
-		this.prependChild(node);
+	if (type == 'pre' && this.childNodes.length>0) {
+		this.insertBefore(node,this.childNodes[0]);
 	} else {
 		this.appendChild(node);
 	}
@@ -250,14 +254,14 @@ HTMLElement.prototype._pendTo = function(mode,path) {
 Append HTMLElement to another valid HTMLElement or CSS path
 */
 HTMLElement.prototype.appendTo = function(path) {
-	return this._pendtTo('ap',path);
+	return this._pendTo('ap',path);
 }
 
 /*
 Prepend HTMLElement to another valid HTMLElement or CSS path
 */
 HTMLElement.prototype.prependTo = function(path) {
-	return this._pendtTo('pre',path);
+	return this._pendTo('pre',path);
 }
 
 /*
@@ -311,7 +315,6 @@ HTMLElement.prototype.getId = function(val) {
 Set id, return self
 */
 HTMLElement.prototype.setId = function(val) {
-	console.log(typeof val)
 	if (typeof val == 'string') {
 		this.attr('id',val);
 	}	
@@ -1009,6 +1012,78 @@ var PureDom = {
 
 	checkbox: function(name,val,attrs) {
 		return this.input("checkbox",name,val,attrs);
+	},
+	
+	label: function(text,forId,attrs) {
+		if (typeof attrs != 'object') {
+			attrs = {};
+		}
+		attrs.for = forId;
+		return this.element("label",attrs,text);
+	},
+	
+	legend: function(text,attrs) {
+		return this.element("legend",attrs,text);
+	},
+	
+	checkboxLabel: function(contTag,name,val,text,attrs) {
+		if (typeof contTag != 'string') {
+			contTag = 'div';
+		}
+		if (typeof attrs != 'object') {
+			attrs = {};
+		}
+		attrs.name = name;
+		if (attrs.hasOwnProperty('id') == false) {
+			attrs.id = attrs.name.sanitize('-');
+		}
+		var forId = attrs.id, outerAttrs = {};
+		el = document.createElement(contTag).addClass(attrs.id + '-option');
+		el.append(this.checkbox(name,val,attrs));
+		el.append(this.label(text,forId));
+		return el;
+	},
+	
+	checkboxes: function(name,options,attrs,selVal,outerWrapper,innerWrapper) {
+		if (typeof outerWrapper != 'string') {
+			outerWrapper = 'div';
+		}
+		if (typeof innerWrapper != 'string') {
+			innerWrapper = 'div';
+		}
+		var el = this.element(outerWrapper,attrs),opt,cName;
+		if (typeof options == 'object' || options.constructor === Array) {
+			for (k in options) {
+				optText = '';
+				if (typeof k == 'string' && typeof options[k] == 'string') {
+					optVal = k;
+					optText = options[k];
+				} else if (typeof options[k] == 'object' && options[k].hasOwnProperty('val') ) {
+					optVal = options[k].val;
+					if (options[k].hasOwnProperty('text')) {
+						optText = options[k].text;
+					}
+				}
+				if (typeof optText == 'string' && optText.length>0) {
+					cName = name + '['+optVal+']';
+					opt = this.checkboxLabel(innerWrapper, cName, optVal,optText, optVal == selVal );
+					el.append(opt);
+				}
+			}
+		}
+		return el;
+	},
+	
+	checkboxesControl: function(name,label,options,attrs,selVal,outerWrapper,innerWrapper) {
+		if (!outerWrapper) {
+			outerWrapper = 'fieldset';
+		}
+		if (!innerWrapper) {
+			innerWrapper = 'div';
+		}
+		var el = this.checkboxes(name,options,attrs,selVal,outerWrapper,innerWrapper);
+		el.prepend(this.legend(label));
+		return el;
 	},
 	
 	radio: function(name,val,attrs) {
