@@ -1,3 +1,9 @@
+/* PureDom v0.0.1 | Author: Neil Gardner, 2015 | License: MIT/GPL */
+
+/*
+Extend native JS String object for easier text processing
+*/
+
 String.prototype.ltrim = function() {
 	return this.replace(/^\s+/,'');
 }
@@ -84,7 +90,9 @@ String.prototype.toFloat = function() {
 	}
 	return 0;
 }
-
+/*
+Language-sensitive text utils library
+*/
 TextUtils = {
 	filterSmallWords: function(word) {
 		switch (word.toLowerCase()) {
@@ -119,6 +127,10 @@ TextUtils = {
 	}
 }
 
+
+/*
+Capitalize irrespective of word or apply filter
+*/
 String.prototype.capitalize = function(smart) {
 	var parts = this.split(/\b/), text = '',
 		num = parts.length,word,wordLen = 0, cast = true;
@@ -147,7 +159,9 @@ String.prototype.titleCase = function(smart) {
 	return this.capitalize(true);
 }
 
-
+/*
+Simply Word object
+*/
 var Word = function(str) {
 	this.letters = str.split('');
 }
@@ -182,6 +196,10 @@ Word.prototype.toString = function() {
 	return this.letters.join('');
 }
 
+/*
+Extend native HTMLElement with additional methods
+for easier DOM manipulation
+*/
 HTMLElement.prototype._pend = function(node,type) {
 	if (typeof node == 'string') {
 		node = document.createTextNode(node);
@@ -194,15 +212,24 @@ HTMLElement.prototype._pend = function(node,type) {
 	return this;
 }
 
+/*
+Alias for appendChild, but alsp lets you directly append text and TextNode
+*/
 HTMLElement.prototype.append = function(node) {
 	return this._pend(node);
 }
 
+/*
+Alias for prependChild, but alsp lets you directly prepend text and TextNode
+*/
 HTMLElement.prototype.prepend = function(node) {
 	return this._pend(node, 'pre');
 }
 
-HTMLElement.prototype.appendTo = function(path) {
+/*
+Append?prepend HTMLElement to another valid HTMLElement or CSS path
+*/
+HTMLElement.prototype._pendTo = function(mode,path) {
 	var el;
 	if (path instanceof HTMLElement) {
 		el = path;
@@ -210,16 +237,50 @@ HTMLElement.prototype.appendTo = function(path) {
 		el = document.querySelector(path);
 	}
 	if (el instanceof HTMLElement) {
-		el.append(this);
+		if (mode == 'pre') {
+			el.prepend(this);
+		} else {
+			el.append(this);
+		}
 	}
 	return this;
 }
 
+/*
+Append HTMLElement to another valid HTMLElement or CSS path
+*/
+HTMLElement.prototype.appendTo = function(path) {
+	return this._pendtTo('ap',path);
+}
+
+/*
+Prepend HTMLElement to another valid HTMLElement or CSS path
+*/
+HTMLElement.prototype.prependTo = function(path) {
+	return this._pendtTo('pre',path);
+}
+
+/*
+Append to document body
+*/
 HTMLElement.prototype.appendToBody = function() {
 	document.body.append(this);
 	return this;
 }
 
+/*
+Prepend to document body
+*/
+HTMLElement.prototype.prependToBody = function() {
+	document.body.prepend(this);
+	return this;
+}
+
+/*
+Set or get attributes as key/value pair in parameters 1 and 2,
+or as JS object
+To get single attribute, just add its key name in first parameter
+*/
 HTMLElement.prototype.attr = function(attrs,val) {
 	if (typeof attrs == 'object') {
 		for (var k in attrs) {
@@ -235,6 +296,9 @@ HTMLElement.prototype.attr = function(attrs,val) {
 	return this;
 }
 
+/*
+Get id, returns empty string if not available
+*/
 HTMLElement.prototype.getId = function(val) {
 	var id = this.attr('id');
 	if (!id) {
@@ -243,6 +307,9 @@ HTMLElement.prototype.getId = function(val) {
 	return id;
 }
 
+/*
+Set id, return self
+*/
 HTMLElement.prototype.setId = function(val) {
 	console.log(typeof val)
 	if (typeof val == 'string') {
@@ -251,6 +318,9 @@ HTMLElement.prototype.setId = function(val) {
 	return this;
 }
 
+/*
+Add a class name, return self
+*/
 HTMLElement.prototype.addClass = function(strClass) {
 	if (typeof strClass == 'string') {
 		this.classList.add(strClass);
@@ -258,6 +328,9 @@ HTMLElement.prototype.addClass = function(strClass) {
 	return this;
 }
 
+/*
+Remove a class name, return self
+*/
 HTMLElement.prototype.removeClass = function(strClass) {
 	if (typeof strClass == 'string') {
 		this.classList.remove(strClass);
@@ -265,14 +338,24 @@ HTMLElement.prototype.removeClass = function(strClass) {
 	return this;
 }
 
+/*
+Remove an attribute, return self
+*/
 HTMLElement.prototype.removeAttr = function(attr) {
-	return this.removeAttribute(attr);
+	this.removeAttribute(attr);
+	return this;
 }
 
+/*
+Insert node before referenced element
+*/
 HTMLElement.prototype.before = function(node) {
 	return this.parentNode.insertBefore(node, this);
 }
 
+/*
+Insert node after referenced element
+*/
 HTMLElement.prototype.after = function(node) {
 	if (this.parentNode.lastChild == this) {
 		return this.parentNode.append(node);
@@ -281,6 +364,9 @@ HTMLElement.prototype.after = function(node) {
 	}
 }
 
+/*
+Fetch tagName in lower case form
+*/
 HTMLElement.prototype.tag = function() {
 	return this.tagName.toLowerCase();
 }
