@@ -24,19 +24,21 @@ PureDom
 
 <p>Add a main section:</p>
 <pre>
+	// Add a "main" element, set its id and append it to the body.
 	var main = PureDom.main().setId("main").toBody();
 </pre>
 
 <p>Add a content region and an aside to the main section:</p>
 <pre>
-	var content = PureDom.section().setId("main-content").appendTo(main);
-	var sidebarFirst = PureDom.aside().setId("sidebar-first").appendTo(main);
+	var content = PureDom.section().setId("main-content").to(main);
+	var sidebarFirst = PureDom.aside().setId("sidebar-first").to(main);
 </pre>
 
 <p>Build a form:</p>
 <pre>
-	var form = PureDom.element("form-name").setId("form-id");
-	content.append(form);
+	// Add a form and append it to the main content region
+	var form = PureDom.element("form-name").setId("form-id").to(content);
+
 </pre>
 <p>Build a select dropdown widget</p>
 <pre>
