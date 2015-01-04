@@ -56,7 +56,24 @@ PureDom
 	form.append(countryCodes);
 </pre>
 
-<h2> HTMLElement Extensions<h2>
+
+<h2> HTML Builder Methods</h2>
+<dl>
+	<dt>PureDom.element(tagName,attrs,text)</dt>
+	<dd>This creates a new DOM element with the specified tag name, attributes, text or other HTML Elements. Attributes are passed as simple JSON. If the last element is a string it will be added as text node and if it's another HTML Element, this will become its first child.</dd>
+	
+	<dt>.h1(text,attrs), .h2(text,attrs), .p(text,attrs),.blockquote(text,attrs)</dt>
+	<dd>Creates simple HTML elements and lets you add text as the first parameter.</dd>
+	
+	<dt>.list(items,attrs)</dt>
+	<dd>Lets you build an unordered list (ul) with each item as a new list item (li) tag. The first parameter must be an array of either simple text strings, in which case no parameters are added, or JSON objects, in which case the "text" attribute serves as the text and other attributes are treated as attributes of each li tag.</dd>
+	
+	<dt>after(HTMLElement)</dt>
+	<dd>Inserts an HTML element before the referenced HTML Element.</dd>
+	
+</dl>
+
+<h2> HTMLElement Extensions</h2>
 <dl>
 	<dt>append(HTMLElement|Text)</dt>
 	<dd>This is both an alias for native JS appendchild(node) and a quick means to add text as a new child text node. It always adds it to the end.</dd>
@@ -82,22 +99,33 @@ PureDom
 	</pre>
 	</dd>
 	
-	<dt>startsWith(string)</dt>
-	<dd>Like the equivalent in Java 
+	<dt>startsWith(string|RegExp), endsWidth(string|RegExp), contains(string|RegExp)</dt>
+	<dd>Like the equivalents in Java and C#:
 		<pre>
 			if (inputText.startsWith("proto") ) {
 				// suggest prototype
 			}
+			
+			if (inputText.endsWith(/(x|ch?ris)mass?/) ) {
+				// say happy Christmas
+			}
+			
 		</pre>
 	</dd>
 	
-	<dt>endsWidth(text)</dt>
-	<dd>Converse</dd>
+	<dt>sanitize(String separator)</dt>
+	<dd>Replaces all non-alphanumeric characters with separator character (e.g. "-") and removes any trailing or leading non-alphanumeric characters.</dd>
 	
-	<dt>contains(string>
-	<dd>Contains the string.</dd>
+	<dt>first(separator), last(separator)</dd>
+	<dd>Returns first or last segment of string before first instance of separator or whole string if no separator exists.
+		<pre>
+			var localPath = 'news/sport/football';
+			var section = localPath.first("/"); // news
+			var subSection = localPath.last("/"); // football
+		</pre>
+	</dd>
 	
-	<dt>contains(string>
+	<dt>contains(string)</dd>
 	<dd>Contains the string.</dd>
 	
 </dl>
