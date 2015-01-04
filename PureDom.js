@@ -17,16 +17,72 @@ String.prototype.trim = function() {
 }
 
 
-String.prototype.startsWith = function(str) {
-	return this.indexOf(str) == 0;
+String.prototype._contains = function(type,str,mode) {
+	var rgx, source;
+	if (str.constructor == RegExp) {
+		switch (mode) {
+		case 'word': case 'f': case 'fuzzy': case 'smart': case 'regex':
+			default:
+				mode = 'f';
+				break;
+		}
+		var ar = str.toString().split('/');
+		str = ar.length>0? ar[1] : '';
+	}
+	switch (mode) {
+		case 'i':
+			source = this.toLowerCase();
+			str = str.toLowerCase();
+			break;
+		case 't': case 'trim':
+			source = this.trim();
+		case 'ti': case 'trimi':
+			source = this.toLowerCase().trim();
+			str = str.toLowerCase();
+			break;
+		case 'f': case 'fuzzy': case 'smart': case 'regex': case 'word':
+			if (typeof str == 'string') {
+				var b = mode=='word'? '\\b' : '';
+				switch (type) {
+					case 'start':
+						rgx = '^' + str + b;
+						break;
+					case 'end':
+						rgx = b + str + '$';
+						break;
+					default:
+						rgx = b + str + b;
+						break;
+				}
+				return new RegExp(rgx,'i').test(this);
+			}
+			break;	
+		default:
+			source = this;
+			break;
+	}
+	var index = source.indexOf(str);
+	switch (type) {
+		case 'start':
+			return  index == 0;
+		case 'end':
+			return  index == (this.length - str.length);	
+		default:
+			return index >= 0;
+	}
+	return false;
 }
 
-String.prototype.endsWith = function(str) {
-	return this.indexOf(str) == this.length - str.length;
+String.prototype.startsWith = function(str,mode) {
+	return this._contains('start',str,mode);
 }
 
-String.prototype.contains = function(str) {
-	return this.indexOf(str) >= 0;
+String.prototype.endsWith = function(str,mode) {
+	return this._contains('end',str,mode);
+}
+
+String.prototype.contains = function(str,mode) {
+	return this._contains('contain',str,mode);
 }
 
 String.prototype.first = function(separator) {
@@ -899,7 +955,7 @@ var PureDom = {
 	},
 	
 	_list: function(type,items,attrs) {
-		var i=0, l;
+		var i=0, atrs={}, l, item, text;
 		if (type == 'ol') {
 			l = this.ol(attrs);
 		} else {
@@ -907,7 +963,16 @@ var PureDom = {
 		}
 		if (items.constructor === Array) {
 			for (; i< items.length; i++) {
-				l.append(this.li(items[i]));
+				item = items[i];
+				if (typeof item =='string' || item instanceof HTMLElement) {
+					text = item;
+					ats = {};
+				} else {
+					text = item.hasOwnProperty('text')? item.text : '';
+					delete item.text;
+					ats = item;
+				}
+				l.append(this.li(text,ats));
 			}
 		}
 		return l;
@@ -1083,7 +1148,7 @@ var PureDom = {
 		return this.element("legend",attrs,text);
 	},
 	
-	checkboxLabel: function(contTag,name,val,text,attrs) {
+	checkboxLabel: function(contTag,name,val,text,attrs, checked) {
 		if (typeof contTag != 'string') {
 			contTag = 'div';
 		}
@@ -1093,6 +1158,9 @@ var PureDom = {
 		attrs.name = name;
 		if (attrs.hasOwnProperty('id') == false) {
 			attrs.id = attrs.name.sanitize('-');
+		}
+		if (checked === true) {
+			attrs.checked = true;
 		}
 		var forId = attrs.id, outerAttrs = {};
 		el = document.createElement(contTag).addClass(attrs.id + '-option');
@@ -1123,7 +1191,7 @@ var PureDom = {
 				}
 				if (typeof optText == 'string' && optText.length>0) {
 					cName = name + '['+optVal+']';
-					opt = this.checkboxLabel(innerWrapper, cName, optVal,optText, optVal == selVal );
+					opt = this.checkboxLabel(innerWrapper, cName, optVal,optText, attrs, optVal == selVal );
 					el.append(opt);
 				}
 			}
