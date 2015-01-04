@@ -97,7 +97,7 @@ String.prototype.toFloat = function() {
 /*
 Language-sensitive text utils library
 */
-TextUtils = {
+var TextUtils = {
 	filterSmallWords: function(word) {
 		switch (word.toLowerCase()) {
 			case 'to':
@@ -131,6 +131,22 @@ TextUtils = {
 	}
 }
 
+
+var PureUtils = {
+
+	filterPendMode: function(mode) {
+		switch (mode) {
+			case "top": case "pre": case "head":
+				mode = "pre";
+				break;
+			default:
+				mode = "ap";
+				break;
+		}
+		return mode;
+	}
+
+}
 
 /*
 Capitalize irrespective of word or apply filter
@@ -253,6 +269,14 @@ HTMLElement.prototype._pendTo = function(mode,path) {
 /*
 Append HTMLElement to another valid HTMLElement or CSS path
 */
+HTMLElement.prototype.to = function(path,mode) {
+	mode = PureUtils.filterPendMode(mode);
+	return this._pendTo(mode,path);
+}
+
+/*
+Append HTMLElement to another valid HTMLElement or CSS path
+*/
 HTMLElement.prototype.appendTo = function(path) {
 	return this._pendTo('ap',path);
 }
@@ -267,17 +291,24 @@ HTMLElement.prototype.prependTo = function(path) {
 /*
 Append to document body
 */
-HTMLElement.prototype.appendToBody = function() {
-	document.body.append(this);
+HTMLElement.prototype.toBody = function(mode) {
+	mode = PureUtils.filterPendMode(mode);
+	document.body._pend(this,mode);
 	return this;
 }
 
 /*
 Prepend to document body
 */
+HTMLElement.prototype.appendToBody = function() {
+	return this.toBody("ap");
+}
+
+/*
+Prepend to document body
+*/
 HTMLElement.prototype.prependToBody = function() {
-	document.body.prepend(this);
-	return this;
+	return this.toBody("pre");
 }
 
 /*
@@ -347,6 +378,32 @@ Remove an attribute, return self
 HTMLElement.prototype.removeAttr = function(attr) {
 	this.removeAttribute(attr);
 	return this;
+}
+
+/*
+Alias for appendChild, but alsp lets you directly append text and TextNode
+*/
+HTMLElement.prototype._pendEl = function(mode,tagName,attrs,text) {
+	if (typeof attrs == 'string') {
+		text = attrs;
+		attrs = {};
+	}
+	var node = document.createElement(tagName).attr(attrs).append(text);
+	return this._pend(node,mode);
+}
+
+/*
+Alias for prependChild, but alsp lets you directly prepend text and TextNode
+*/
+HTMLElement.prototype.appendEl = function(tagName,attrs,text) {
+	return this._pendEl('ap', tagName, attrs,text);
+}
+
+/*
+Alias for prependChild, but alsp lets you directly prepend text and TextNode
+*/
+HTMLElement.prototype.prependEl = function(tagName,attrs,text) {
+	return this._pendEl('pre', tagName, attrs,text);
 }
 
 /*
@@ -936,7 +993,7 @@ var PureDom = {
 							ats = rows[i].attrs;
 						}
 					} else {
-						cell = rows[i];
+						cell = rows[i].toString();
 						switch (tagName) {
 							case 'thead':
 								subTagName = 'th';
