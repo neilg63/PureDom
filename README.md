@@ -6,8 +6,10 @@ PureDom
 
 <p>Add a header:</p>
 <pre>
-	var header = PureDom.header().setId("top-header").appendToBody();
-	var h1 = PureDom.h1("Page Title").addClass("main-title").appendTo(header);
+	// Create header element, set its id and append it to the body
+	var header = PureDom.header().setId("top-header").toBody();
+	// Append h1 element to the new header region
+	var h1 = PureDom.h1("Page Title").addClass("main-title").to(header);
 </pre>
 
 <p>Add main menu:</p>
