@@ -29,6 +29,9 @@ String.prototype._contains = function(type,str,mode) {
 		var ar = str.toString().split('/');
 		str = ar.length>0? ar[1] : '';
 	}
+	if (typeof str != 'string') {
+		str = '';
+	}
 	switch (mode) {
 		case 'i':
 			source = this.toLowerCase();
@@ -41,21 +44,19 @@ String.prototype._contains = function(type,str,mode) {
 			str = str.toLowerCase();
 			break;
 		case 'f': case 'fuzzy': case 'smart': case 'regex': case 'word':
-			if (typeof str == 'string') {
-				var b = mode=='word'? '\\b' : '';
-				switch (type) {
-					case 'start':
-						rgx = '^' + str + b;
-						break;
-					case 'end':
-						rgx = b + str + '$';
-						break;
-					default:
-						rgx = b + str + b;
-						break;
-				}
-				return new RegExp(rgx,'i').test(this);
+			var b = mode=='word'? '\\b' : '';
+			switch (type) {
+				case 'start':
+					rgx = '^' + str + b;
+					break;
+				case 'end':
+					rgx = b + str + '$';
+					break;
+				default:
+					rgx = b + str + b;
+					break;
 			}
+			return new RegExp(rgx,'i').test(this);
 			break;	
 		default:
 			source = this;
