@@ -87,6 +87,20 @@ PureDom
 	<dt>after(HTMLElement)</dt>
 	<dd>Inserts an HTML element before the referenced HTML Element.</dd>
 	
+	<dt>to(path|HTMLElement,mode)</dt>
+	<dd>Appends the current item to the element referenced by the first parameter, either by reference or by adding a valid CSS path. If mode is set to "pre" or "top", it will be prepended.<pre>
+		var mainContent = PureDom.section().setId("main-content");
+		PureDom.list(["Tomatoes","Lettuce","Carrots"]).addClass("salad-items").to(mainContent);
+		PureDom.list(["Bread","Margarine","Jam"]).addClass("breakfast-items").to("#main-content","top");
+	</pre></dd>
+	
+	<dt>toBody(mode)</dt>
+	<dd>Appends the current item to the main body. If mode is set to "pre" or "top", it will be prepended.<pre>
+		var mainContent = PureDom.section().setId("main-content");
+		PureDom.list(["Tomatoes","Lettuce","Carrots"]).addClass("salad-items").to(mainContent);
+		PureDom.list(["Bread","Margarine","Jam"]).addClass("breakfast-items").to("#main-content");
+	</pre></dd>
+	
 </dl>
 
 <h2> String Extensions</h2>
