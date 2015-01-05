@@ -278,13 +278,27 @@ Extend native HTMLElement with additional methods
 for easier DOM manipulation
 */
 HTMLElement.prototype._pend = function(node,type) {
+	var ih = false;
 	if (typeof node == 'string') {
-		node = document.createTextNode(node);
+		if (node.indexOf("<") >= 0 && node.indexOf(">") > 0 ) {
+			ih = /<\w+[^>]*?>/.test(node);
+		}
+		if (!ih) {
+			node = document.createTextNode(node);
+		}
 	}
 	if (type == 'pre' && this.childNodes.length>0) {
-		this.insertBefore(node,this.childNodes[0]);
+		if (ih) {
+			this.innerHTML = node + this.innerHTML;
+		} else {
+			this.insertBefore(node,this.childNodes[0]);
+		}
 	} else {
-		this.appendChild(node);
+		if (ih) {
+			this.innerHTML += node;
+		} else {
+			this.appendChild(node);
+		}
 	}
 	return this;
 }
@@ -1209,6 +1223,17 @@ var PureDom = {
 		}
 		var el = this.checkboxes(name,options,attrs,selVal,outerWrapper,innerWrapper);
 		el.prepend(this.legend(label));
+		return el;
+	},
+	
+	selectControl: function(name,label,options,attrs,selVal,outerWrapper) {
+		if (!outerWrapper) {
+			outerWrapper = 'div';
+		}
+		var el = this.element(outerWrapper,attrs);
+		this.label(label).to(el);
+		innerAttrs = {};
+		this.select(name,options,innerAttrs,selVal).to(el);
 		return el;
 	},
 	
