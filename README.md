@@ -39,7 +39,7 @@ PureDom
 <p>Build a form:</p>
 <pre>
 	// Add a form and append it to the main content region
-	var form = PureDom.element("form-name").setId("form-id").to(content);
+	var form = PureDom.form("form-name").setId("form-id").to(content);
 
 </pre>
 <p>Build a select dropdown widget</p>

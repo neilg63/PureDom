@@ -1341,6 +1341,6 @@ var PureDom = {
 	setTitle: function(title) {
 		document.title = title;
 		return document;
-	},
+	}
 	
 }
