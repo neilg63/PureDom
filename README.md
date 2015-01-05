@@ -45,17 +45,17 @@ PureDom
 <p>Build a select dropdown widget</p>
 <pre>
 	var opts = {
-		_: "None",
-		br: "Brazil",
-		cn: "China",
-		id: "Indonesia",
-		in: "India",
-		jp: "Japan",
-		mx: "Mexico",
-		ng: "Nigeria",
-		ru: "Russia",
-		us: "United States",
-	}
+		"_": "None",
+		"br": "Brazil",
+		"cn": "China",
+		"id": "Indonesia",
+		"in": "India",
+		"jp": "Japan",
+		"mx": "Mexico",
+		"ng": "Nigeria",
+		"ru": "Russia",
+		"us": "United States"
+	};
 	var countryCodes = PureDom.select("country",opts,{id:"county-code"},"in");
 	form.append(countryCodes);
 </pre>
