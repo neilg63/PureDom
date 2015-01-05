@@ -435,7 +435,10 @@ Add a class name, return self
 */
 HTMLElement.prototype.addClass = function(strClass) {
 	if (typeof strClass == 'string') {
-		this.classList.add(strClass);
+		var cls = strClass.split(' '),i;
+		for (i in cls) {
+			this.classList.add(cls[i]);
+		}
 	}
 	return this;
 }
@@ -445,7 +448,10 @@ Remove a class name, return self
 */
 HTMLElement.prototype.removeClass = function(strClass) {
 	if (typeof strClass == 'string') {
-		this.classList.remove(strClass);
+		var cls = strClass.split(' '),i;
+		for (i in cls) {
+			this.classList.remove(cls[i]);
+		}
 	}
 	return this;
 }
@@ -1237,10 +1243,20 @@ var PureDom = {
 		if (!outerWrapper) {
 			outerWrapper = 'div';
 		}
-		var el = this.element(outerWrapper,attrs);
+		var el = this.element(outerWrapper,attrs)
+			.addClass(name.sanitize('-') + '-control select-control');
 		this.label(label).to(el);
-		innerAttrs = {};
-		this.select(name,options,innerAttrs,selVal).to(el);
+		this.select(name,options,attrs,selVal).to(el);
+		return el;
+	},
+	
+	textfieldControl: function(name,label,val,attrs,outerWrapper) {
+		if (!outerWrapper) {
+			outerWrapper = 'div';
+		}
+		el = this.element(outerWrapper).addClass(name.sanitize('-') + '-control textfield-control');
+		this.label(label).to(el);
+		this.textfield(name,val,attrs).to(el);
 		return el;
 	},
 	

@@ -66,7 +66,7 @@ PureDom
 	<dt>PureDom.element(tagName,attrs,text)</dt>
 	<dd>This creates a new DOM element with the specified tag name, attributes, text or other HTML Elements. Attributes are passed as simple JSON. If the last element is a string it will be added as text node and if it's another HTML Element, this will become its first child.</dd>
 	
-	<dt>.h1(text,attrs), .h2(text,attrs), .p(text,attrs),.blockquote(text,attrs)</dt>
+	<dt>.h1(text,attrs), .h2(text,attrs), .p(text,attrs), .blockquote(text,attrs)</dt>
 	<dd>Creates simple HTML elements and lets you add text as the first parameter.</dd>
 	
 	<dt>.list(items,attrs)</dt>
