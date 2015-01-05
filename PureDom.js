@@ -34,14 +34,21 @@ String.prototype._contains = function(type,str,mode) {
 	}
 	switch (mode) {
 		case 'i':
-			source = this.toLowerCase();
-			str = str.toLowerCase();
-			break;
-		case 't': case 'trim':
-			source = this.trim();
-		case 'ti': case 'trimi':
-			source = this.toLowerCase().trim();
-			str = str.toLowerCase();
+		case 't': case 'trim': case 'ti':
+			switch (mode) {
+				case 'i': case 'ti':
+					source = this.toLowerCase();
+					str = str.toLowerCase();
+					break;
+				default:
+					source = this;
+					break;
+			}
+			switch (mode) {
+				case 't': case 'ti': case 'trim':
+					source = source.trim();
+					break;
+			}
 			break;
 		case 'f': case 'fuzzy': case 'smart': case 'regex': case 'word':
 			var b = mode=='word'? '\\b' : '';
