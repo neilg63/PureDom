@@ -533,7 +533,8 @@ HTMLElement.prototype.val = function() {
 	var result = '';
 	switch (this.tag()) {
 		case 'input':
-			return this.getAttribute('value');
+		case 'textarea':	
+			return this.value;
 		case 'select':
 			return this.querySelector("option:selected");
 		default:

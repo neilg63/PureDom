@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html class="html-vw">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PureDom HTML Builder Sample</title>
+<script src="PureDom.js"></script>
+<link href="http://fonts.googleapis.com/css?family=Cabin:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+<style>
+
+section, aside, article, header, footer, main {
+	position: relative;
+}
+
+header#top-header {
+	height: 6em;
+	border: dashed 1px #999999;
+}
+
+footer {
+	clear: both;
+	border-top: dashed 1px #dd7777;
+	text-align: center;
+	margin: 2vh auto;
+	padding: 2vh 3%;
+}
+
+#main {
+	width: 100%;
+	clear: both;
+	border: dashed 1px #999999;
+}
+
+aside#sidebar-first {
+	float: left;
+	width: 20%;
+	padding: 2%;
+	margin: 2%;
+	border-right: dashed 1px #6666cc;
+}
+
+
+section#main-content {
+	float: right;
+	clear: none;
+	width: 60%;
+	padding: 2%;
+	margin: 2%;
+}
+
+#control-form {
+	position: fixed;
+	display: block;
+	top: 0;
+	left: 0;
+	width: 39%;
+}
+
+#page {
+	margin: 0 0 0 40%;
+	padding: 0;
+}
+
+
+</style>
+
+
+</head>
+
+<body>
+<pre>
+<form id="control-form">
+<textarea id="script-tester" cols="80" rows="40">
+
+	var p = PureDom, b = document.body;
+
+	var header = p.header().setId("header").toBody();
+
+	var main = p.main().setId("main").toBody();
+
+	var sidebarFirst = p.aside().setId("sidebar-first").to(main);
+	var content = p.section().setId("main-content").to(main);
+
+	var h1 = p.h1("Pure Dom Heading").addClass("main-title").attr({title:"hope"});
+	
+		header.append(h1);
+	
+		var links = [
+			{href:"/news",text:"News"},
+			{href:"/blog",text:"Blog"},
+			{href:"/movies",text:"Movies"},
+			{href:"/shop",text:"Shop"}
+		];
+		var mn = p.menu(links).to(sidebarFirst);
+	
+		var ul = p.list(["grapes","bananas","apples"]).addClass("fruits").to(sidebarFirst);
+	
+		ul.before( p.p("Fruits") )
+
+		// Add some more fruits
+		ul.push("Pears").push("Peaches").push("Ananas");
+		ul.push("Kiwi",{"class":"special"});
+
+		var ol = p.numList(["pens","pencils","erasers"])
+							.addClass("stationery")
+							.to(content)
+							.insert(1,"Staplers");
+
+	var hCells = ["Name","Height","Width","Depth","Weight"];
+
+	var rows = [
+		["Toaster",22,33,19,0.7],
+		["Blender", 40,70,20,2.7],
+		["Kettle",24,16,16,1.2],
+		["Fridge",160,60,50,67.8]
+	];
+
+		var ta = p.table(hCells,rows,{"id":"utensils"},{firstHead:true,oddEven:true, autoClasses:true})
+							.to(content);
+	
+
+		var dItems = [
+			{
+				dt: "Mammals",
+				dd: "In consectetur erat at metus convallis rutrum mollis ante tempor"
+			},
+			{
+				dt: "Birds",
+				dd: "Praesent bibendum gravida augue, quis fermentum magna mattis eget. Sed et quam est."
+			},
+			{
+				dt: "Fish",
+				dd: " Pellentesque magna est, vulputate nec tristique in, vulputate in ligula."
+			}
+		];
+
+		var dl = p.dl(dItems).to(content);
+	
+		var f = p.form("my-form").to(content);
+	
+		var tx = p.textfieldControl("firstname","First name","",{placeholder:"Please enter your name", size: 40}).to(f);
+	
+	
+		var opts = {
+			"_": "None",
+			"br": "Brazil",
+			"cn": "China",
+			"id": "Indonesia",
+			"in": "India",
+			"jp": "Japan",
+			"pk": "Pakistan",
+			"mx": "Mexico",
+			"ng": "Nigeria",
+			"ru": "Russia",
+			"us": "United States",
+			"za": "South Africa"
+		};
+		var sl = p.selectControl("country","Nearest poplulous country",opts,{id:"county-code"},"in").to(f);
+	
+	
+		p.p("Quisque fringilla metus ac risus fermentum fermentum id cursus sapien. Nam id elit magna. Donec tincidunt eleifend sapien, eget adipiscing arcu facilisis eget. Proin velit quam, lobortis id tempus non, porttitor non velit. In rutrum mattis neque, at porttitor est iaculis at. ").to(f);
+
+		f.find("input,select").addClass("green");
+		var bs = b.find("li").match(/a[pln]+[ae]/i);
+	
+		ta = ta.wrap("article");
+	
+		f.first("p").enclose("em");
+	
+		p.footer().setId("footer").toBody().appendEl("p","Some footer text");
+
+		var opts2 = {
+			"m": "Male",
+			"f": "Female",
+			"u": "Unsure"
+		};
+		
+		var gn = p.checkboxesControl("gender","Gender", opts2,{id:"gender-code"},"u").to(f);
+		
+		p.submit("submit","Submit").to(f);
+		
+		var txt = "Cliche farm-to-table bicycle rights pork belly.";
+		
+		var plants = [
+			{text:"Rose",'class': "red"},
+			{text:"Daffodil",'class': "yellow"}
+		];
+		p.list(plants).addClass("plants").to(content);
+		
+		p.article().to(content).append("<p>This is some literal HTML</p>");
+
+</textarea>
+<button id="run-script">Run</button>
+</pre>
+
+
+</form>
+
+
+<div id="page">
+	
+</div>
+
+<script>
+
+	/* PureDom v0.0.1 | Author: Neil Gardner, 2015 | License: MIT/GPL */
+
+window.onload = function() {
+
+	var evalScript = function() {
+		document.body.first("#page").innerHTML = '';
+		eval(document.body.first("#script-tester").value);
+	}
+
+	HTMLElement.prototype.toBody = function() {
+		return this.to('#page');
+	}
+
+	var b = document.body;
+	b.first("#run-script").onclick = function(e) {
+		evalScript();
+		console.log('yu')
+		e.preventDefault();
+		e.stopImmediatePropagation();
+	}
+
+	evalScript();
+
+}
+	
+</script>
+</body>
+</html>
