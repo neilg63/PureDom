@@ -131,7 +131,7 @@ String.prototype.segment = function(index,separator) {
 }
 
 String.prototype.sanitize = function(separator) {
-	return this.replace(/[^0-9a-z]+/gi,separator).replace(/[^0-9a-z]+$/i,'');
+	return this.toLowerCase().replace(/[^0-9a-z]+/g,separator).replace(/[^0-9a-z]+$/i,'');
 }
 
 String.prototype.numberStrings = function() {
@@ -457,6 +457,20 @@ HTMLElement.prototype.removeClass = function(strClass) {
 }
 
 /*
+Remove a class name, return self
+*/
+NodeList.prototype.removeClass = function(strClass) {
+	return PureHTML.removeClassFromList(this,strClass);
+}
+
+/*
+Remove a class name, return self
+*/
+HTMLCollection.prototype.removeClass = function(strClass) {
+	return PureHTML.removeClassFromList(this,strClass);
+}
+
+/*
 Remove an attribute, return self
 */
 HTMLElement.prototype.removeAttr = function(attr) {
@@ -655,15 +669,11 @@ NodeList.prototype.attr = function(attrs) {
 }
 
 NodeList.prototype.addClass = function(className) {
-	var self = this;
-	if (this.length > 0) {
-		for (k in self) {
-			if (self[k] instanceof HTMLElement) {
-				self[k].addClass(className);
-			}
-		}
-	}
-	return this;
+	return PureHTML.addClassToList(this,className);
+}
+
+HTMLCollection.prototype.addClass = function(className) {
+	return PureHTML.addClassToList(this,className);
 }
 
 NodeList.prototype.removeClass = function(className) {
@@ -690,6 +700,10 @@ HTMLElement.prototype.hasClass = function(className) {
 	return false;
 }
 
+HTMLElement.prototype.classes = function() {
+	return this.attr('class').trim().split(/s+/);
+}
+
 HTMLElement.prototype.hasAnyOfClasses = function(){
 	for (var i= 0, il=arguments.length; i<il; i++){
 		if (this.hasClass(arguments[i])) return true;
@@ -697,8 +711,21 @@ HTMLElement.prototype.hasAnyOfClasses = function(){
 	return false;
 }
 
-HTMLElement.prototype._matchClasses = function(rgx,fragment) {
-	var self = this, i =0, n, nc = 0;
+HTMLElement.prototype.get = function(){
+	for (var i= 0, il=arguments.length, el = this; i<il, isChild = false; i++){
+		if (el.childNodes.length > arguments[i] && el.childNodes[arguments[i]] instanceof HTMLElement) {
+			el = el.childNodes[arguments[i]]
+			isChild = true;
+		}
+	}
+	if (!isChild) {
+		el = document.createDocumentFragment();
+	}
+	return el;
+}
+
+HTMLElement.prototype._matchClasses = function(rgx) {
+	var self = this, i =0, n, nn, nc = 0;
 	if (self.childNodes.length > 0) {
 		for (k in self.childNodes) {
 			n = self.childNodes[k];
@@ -707,12 +734,12 @@ HTMLElement.prototype._matchClasses = function(rgx,fragment) {
 				if (nc>0) {
 					for (i=0;i<nc;i++) {
 						if (rgx.test(n.classList[i])) {
-							fragment.appendChild(n);
+							n.addClass(PureHTML.UTILCLASS);
 						}
 					}
 				}
 				if (n.childNodes.length>0) {
-					n._matchClasses(rgx,fragment);
+					n._matchClasses(rgx);
 				}
 			}
 		}
@@ -723,11 +750,12 @@ HTMLElement.prototype.matchClass = function(rgx,params) {
 	if (typeof rgx == 'string') {
 		rgx = new RegExp(rgx,'i');
 	}
-	var fragment = document.createDocumentFragment();
+	document.body.find('.' + PureHTML.UTILCLASS).removeClass(PureHTML.UTILCLASS);
 	if (rgx instanceof RegExp) {
-		this._matchClasses(rgx,fragment);
+		this._matchClasses(rgx);
 	}
-	return fragment.childNodes;
+	var els = document.body.find('.' + PureHTML.UTILCLASS).removeClass(PureHTML.UTILCLASS);
+	return els;
 }
 
 HTMLElement.prototype._containsClass = function(mode,str,caseSensitive) {
@@ -816,6 +844,8 @@ NodeList.prototype.replace = function(rgx,repl) {
 */
 PureHTML = {
 	
+	UTILCLASS: 'xy_z9q_',
+	
 	insert: function(self,index,text,attrs) {
 		var cn = self.childNodes, c, el;
 		if (index >= cn.length) {
@@ -837,6 +867,29 @@ PureHTML = {
 		var el = document.createElement('li').attr(attrs).append(text);
 		return self.prepend(el);
 	},
+	
+	removeClassFromList: function(self,className) {
+		if (typeof className == 'string' && self.length>0) {
+			var n;
+			for (k in self) {
+				if (self[k] instanceof HTMLElement) {
+					self[k].removeClass(className);
+				}
+			}
+		}
+		return self;
+	},
+	
+	addClassToList: function(self, className) {
+		if (typeof className == 'string' && self.length > 0) {
+			for (k in self) {
+				if (self[k] instanceof HTMLElement) {
+					self[k].addClass(className);
+				}
+			}
+		}
+		return self;
+	}
 
 };
 
@@ -864,7 +917,36 @@ HTMLOListElement.prototype.push = function(text,attrs) {
 	return PureHTML.push(this,text,attrs);
 }
 
+HTMLElement.prototype.localPath = function() {
+	var path =  this.tag();
+	if (this.getId().length>0) {
+		path += '#'+this.getId();
+	}
+	if (this.classList.length>0) {
+		path += '.' + this.classes().join('.');
+	}
+	return path;
+}
+
+HTMLElement.prototype.fullPath = function() {
+	var paths= [], el = this;
+	paths.unshift(el.localPath());
+	while (el.parentNode) {
+	    paths.unshift(el.localPath());
+	    el = el.parentNode;
+	}
+	return paths.join(' ');
+}
+
 var PureDom = {
+	
+	numEls: function(path) {
+		return document.body.find(path).length;
+	},
+	
+	hasPath: function(path) {
+		return this.numEls() > 0;
+	},
 	
 	_addOpts: function(opts,settings) {
 		if (typeof opts == 'object') {
@@ -1062,6 +1144,39 @@ var PureDom = {
 		return el;
 	},
 	
+	Cell: function(params,text,attrs) {
+		var type = params;
+		if (typeof params != 'object') {
+			if (!params.type) {
+				type = params.type;
+			}
+			if (!type.text) {
+				text = params.text;
+			}
+			if (!type.attrs) {
+				attrs = params.attrs;
+			}
+		}
+		if (typeof type != 'string' || type.length < 2) {
+			type = 'td';
+		} 
+		if (typeof text != 'string') {
+			text = '';
+		}
+		if (typeof attrs != 'object') {
+			attrs = {};
+		}
+		this.type = type;
+		this.text = text;
+		this.attrs = attrs;
+		this.attr = function(key) {
+			if (this.attrs.hasOwnProperty(key)) {
+				return this.attrs[key];
+			}
+			return '';
+		}
+	},
+	
 	tcell: function(type,text,attrs) {
 		switch (type) {
 			case 'th': case 'h':
@@ -1074,19 +1189,18 @@ var PureDom = {
 		return this.element(type,attrs,text.toString());
 	},
 	
-	_trs: function(tagName,rows,attrs,firstHead) {
+	_trs: function(tagName,cells,attrs,firstHead,cellClasses) {
 		var t = this.element(tagName,attrs),i=0,subTagName = 'td', itemAttrs={},ats={},cell;
-		if (rows.constructor === Array) {
-			if (rows && rows.length) {
-				for (; i< rows.length; i++) {
-					if (typeof rows[i] == 'object') {
-						subTagName = rows[i].type;
-						cell = rows[i].text;
-						if (rows[i].attrs) {
-							ats = rows[i].attrs;
-						}
+		if (cells.constructor === Array) {
+			var hasCellClasses = (cellClasses instanceof Array && cellClasses.length>0), c; 
+			if (cells && cells.length) {
+				for (; i< cells.length; i++) {
+					if (typeof cells[i] == 'object') {
+						subTagName = cells[i].type;
+						cell = cells[i].text;
+						ats = cells[i].attrs;
 					} else {
-						cell = rows[i].toString();
+						cell = cells[i].toString();
 						switch (tagName) {
 							case 'thead':
 								subTagName = 'th';
@@ -1096,28 +1210,33 @@ var PureDom = {
 								break;
 						}
 					}
-					t.append(this.tcell(subTagName,cell,ats));
+					c = this.tcell(subTagName,cell,ats);
+					if (cellClasses.length > i) {
+						c.addClass(cellClasses[i]);
+					}
+					t.append(c);
 				}
 			}
 		}
 		return t;
 	},
 	
-	thead: function(items,attrs) {
-		return this._trs('thead', items,attrs);
+	thead: function(items,attrs,cellClasses) {
+		return this._trs('thead', items,attrs,false,cellClasses);
 	},
 	
-	tr: function(items,attrs,firstHead) {
-		return this._trs('tr', items,attrs,firstHead);
+	tr: function(items,attrs,firstHead,cellClasses) {
+		return this._trs('tr', items,attrs,firstHead,cellClasses);
 	},
 	
-	tbody: function(rows,attrs,opts) {
-		opts = this._addOpts(opts,{firstHead:false,oddEven:false});
-		var tb = this.element('tbody',attrs),i=0,r;
+	tbody: function(rows,attrs,opts,cellClasses) {
+		opts = this._addOpts(opts,{firstHead:false,oddEven:false,cellClasses:[]});
+		var tb = this.element('tbody',attrs),i=0,r,
+		hasCellClasses = (opts.cellClasses instanceof Array && opts.cellClasses.length>0);
 		if (rows && rows.length) {
 			for (; i< rows.length; i++) {
 				if (rows[i].constructor === Array) {
-					r = this.tr(rows[i],{},opts.firstHead);
+					r = this.tr(rows[i],{},opts.firstHead,cellClasses);
 					if (opts.oddEven) {
 						r.addClass(i%2==0? 'odd' : 'even');
 					}
@@ -1129,13 +1248,31 @@ var PureDom = {
 	},
 	
 	table: function(header, rows,attrs,opts) {
-		opts = this._addOpts(opts,{firstHead:false,oddEven:false});
-		var ta = this.element('table',attrs);
+		opts = this._addOpts(opts,{firstHead:false,oddEven:false,autoClasses:false});
+		var ta = this.element('table',attrs),cellClasses = [], c, t;
+		
 		if (header.constructor === Array) {
-			ta.append(this.thead(header));
+			if (opts.autoClasses) {
+				for (var i in header) {
+					if (typeof header[i] == 'object') {
+						c = new Cell(header[i]);
+						if (c.attrs('class').length > 0) {
+							t = c.attrs('class').split(' ').shift();
+						} else if (c.attr('text').length>0) {
+							t = c.text;
+						}
+					} else {
+						t = c;
+					}
+					if (t) {
+						cellClasses.push(t.sanitize('-'));
+					}
+				}
+			}
+			ta.append(this.thead(header,{},cellClasses));
 		}
 		if (rows.constructor === Array) {
-			ta.append(this.tbody(rows,{},opts));
+			ta.append(this.tbody(rows,{},opts, cellClasses));
 		}
 		return ta;
 	},
