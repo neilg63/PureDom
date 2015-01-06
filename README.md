@@ -4,7 +4,7 @@ PureDom
 <p>PureDom is a highly efficient HTML builder and DOM transformer, optimized for the latest browser engines, but targeted mainly for use with Node JS and MVC frameworks as an alternative to HTML templates. It is designed to translate model data into semantic HTML.</p>
 <p>PureDom is not concerned with legacy browser compatibility or special effects and as such does not compete with more established and extensive libraries such as jQuery, Dojo or Prototype or frameworks such as Mootools, though you may recognise some of the convenience methods common to jQuery.</p>
 
-  <h3>Please view <a href="http://multifaceted.info/demos/puredom/puredom-tester.html" target="_blank">Demo</a></h3>
+  <h3>Please view a live <a href="http://multifaceted.info/demos/puredom/puredom-tester.html" target="_blank">Demo</a> where can try out the new HTML Builder framework yourself.</h3>
 
 <p>Add a header:</p>
 <pre>
