@@ -4,6 +4,8 @@ PureDom
 <p>PureDom is a highly efficient HTML builder and DOM transformer, optimized for the latest browser engines, but targeted mainly for use with Node JS and MVC frameworks as an alternative to HTML templates. It is designed to translate model data into semantic HTML.</p>
 <p>PureDom is not concerned with legacy browser compatibility or special effects and as such does not compete with more established and extensive libraries such as jQuery, Dojo or Prototype or frameworks such as Mootools, though you may recognise some of the convenience methods common to jQuery.</p>
 
+  <h3>Please view <a href="http://multifaceted.info/demos/puredom/puredom-tester.html">Demo</a></h3>
+
 <p>Add a header:</p>
 <pre>
 	// Create header element, set its id and append it to the body
@@ -105,6 +107,14 @@ PureDom
 		PureDom.list(["Bread","Margarine","Jam"]).addClass("breakfast-items").to("#main-content");
 	</pre></dd>
 	
+	<dt>attr(Object attrs), attr(String property, String val), attr(String property)</dt>
+	<dd>Lets you set or access html element attributes. If the first parameter is a JSON object, then the key/value map will be translated into HTML attribute properties and values. If the first and second parameters are strings, the second will set the value of the attribute specified in the first parameter. To get an attribute, just add a string as a first parameter. If the property is not set, the getter method will return an empty string.<pre>
+		// translates to title=Descriptive long title" class="info" id="technical-info"
+		myElement.attr({title:"Descriptive long title","class": "info", "id": "technical-info"});
+		myElement.attr("title","A very and verbose long title"); // sets title attribute only
+		myElement.attr("title"); // sets title attribute only
+	</pre></dd>
+	
 </dl>
 
 <h2> String Extensions</h2>
@@ -143,7 +153,13 @@ PureDom
 		</pre>
 	</dd>
 	
-	<dt>contains(string)</dd>
-	<dd>Contains the string.</dd>
+	<dt>head(string), tail(string)</dd>
+	<dd>Returns the remainder of the string after the first specified separator (tail) or before the last specified separator.
+		<pre>
+			var longPath = 'news/europe/portugal/2015/article-title';
+			var head = longPath.head('/'); // => 'news/europe/portugal/2015';
+			var tail = longPath.tail('/'); // => 'europe/portugal/2015/article-title';	
+		</pre>
+	</dd>
 	
 </dl>
