@@ -102,9 +102,8 @@ PureDom
 	
 	<dt>toBody(mode)</dt>
 	<dd>Appends the current item to the main body. If mode is set to "pre" or "top", it will be prepended.<pre>
-		var mainContent = PureDom.section().setId("main-content");
-		PureDom.list(["Tomatoes","Lettuce","Carrots"]).addClass("salad-items").to(mainContent);
-		PureDom.list(["Bread","Margarine","Jam"]).addClass("breakfast-items").to("#main-content");
+		var mainContent = PureDom.section().setId("main-content").toBody();
+		var topNav = PureDom.header().setId("top-nav").toBody("top");
 	</pre></dd>
 	
 	<dt>attr(Object attrs), attr(String property, String val), attr(String property)</dt>
