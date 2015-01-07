@@ -12,9 +12,10 @@ section, aside, article, header, footer, main {
 	position: relative;
 }
 
-header#top-header {
-	height: 6em;
+header#header {
 	border: dashed 1px #999999;
+	margin: 0 auto;
+	text-align: center;
 }
 
 footer {
@@ -49,16 +50,77 @@ section#main-content {
 }
 
 #control-form {
-	position: fixed;
 	display: block;
 	top: 0;
 	left: 0;
-	width: 39%;
+	
+}
+
+#control-form textarea {
+	font-family: "Lucida Console", "Courier New", Monaco, Courier, monospace;
+	max-width: 100%;
+	color: #111166;
+	margin: 0 0 1em 0;
+	width: 100%;
 }
 
 #page {
-	margin: 0 0 0 40%;
+	margin:0;
 	padding: 0;
+}
+
+fieldset {
+	border: none;
+}
+
+#page dt {
+	font-weight: bold;
+}
+
+#my-form > div {
+	margin: 0.5em 0;
+}
+
+#control-form button {
+	clear: both;
+	float: right;
+	margin: 0.5em;
+	font-size: 2em;
+	border: solid 1px #000066;
+	border-radius: 0.5em;
+	padding: 0.125em 0.25em;
+	background-color: #ffff66;
+	-webkit-transition: all 0.5s;
+	transition: all 0.5s;
+}
+
+#control-form button:hover {
+	background-color: #ff9933;
+}
+
+@media (max-width: 1199px) {
+	#control-form {
+		position: relative;
+		width: 100%;
+	}
+		#control-form,
+	#control-form textarea {
+		max-height: 15em;
+		width: 100%;
+	}
+}
+
+@media (min-width: 1200px) {
+	#control-form {
+		position: fixed;
+		width: 40%;
+	}
+	#control-form textarea {
+		min-height: 75vh;
+	}
+	#page {
+		margin-left: 40%;
+	}
 }
 
 
@@ -68,7 +130,7 @@ section#main-content {
 </head>
 
 <body>
-<pre>
+
 <form id="control-form">
 <textarea id="script-tester" cols="80" rows="40">
 
@@ -136,7 +198,7 @@ section#main-content {
 
 		var dl = p.dl(dItems).to(content);
 	
-		var f = p.form("my-form").to(content);
+		var f = p.form("my-form").setId("my-form").to(content);
 	
 		var tx = p.textfieldControl("firstname","First name","",{placeholder:"Please enter your name", size: 40}).to(f);
 	
@@ -190,8 +252,9 @@ section#main-content {
 		p.article().to(content).append("<p>This is some literal HTML</p>");
 
 </textarea>
+<div class=="action">
 <button id="run-script">Run</button>
-</pre>
+</div>
 
 
 </form>

@@ -183,6 +183,10 @@ var sidebarFirst = p.aside().setId("sidebar-first").to(main);
 
 
 		p.setTitle("Sample Title");
+		
+		content.first("table").matchClass(/th$/).addClass('ends-in-th');
+		var nstr = "fucking hell I don't have a clue 78.9 help please";
+		console.log( nstr.endNumber()  );
 
 }
 	
