@@ -142,6 +142,18 @@ String.prototype.toNumberString = function() {
 	return this.numberStrings().shift();
 }
 
+String.prototype.endNumber = function() {
+	var n = -1, ns = this.numberStrings();
+	if (ns.length>0) {
+		n = ns.pop() - 0;
+	}
+	return n;
+}
+
+String.prototype.endInt = function() {
+	return Math.abs(parseInt(this.endNumber()));
+}
+
 
 String.prototype.toInt = function() {
 	var n = this.toNumberString();
@@ -751,12 +763,11 @@ HTMLElement.prototype.matchClass = function(rgx,params) {
 	if (typeof rgx == 'string') {
 		rgx = new RegExp(rgx,'i');
 	}
-	document.body.find('.' + PureHTML.UTILCLASS).removeClass(PureHTML.UTILCLASS);
+	PureHTML.removeUtilClass();
 	if (rgx instanceof RegExp) {
 		this._matchClasses(rgx);
 	}
-	var els = document.body.find('.' + PureHTML.UTILCLASS).removeClass(PureHTML.UTILCLASS);
-	return els;
+	return PureHTML.matchUtilClass();
 }
 
 HTMLElement.prototype._containsClass = function(mode,str,caseSensitive) {
@@ -846,6 +857,14 @@ NodeList.prototype.replace = function(rgx,repl) {
 PureHTML = {
 	
 	UTILCLASS: 'xy_z9q_',
+	
+	removeUtilClass: function(){
+		return document.body.removeClass(PureHTML.UTILCLASS);
+	},
+	
+	matchUtilClass: function(){
+		return document.body.find('.' + PureHTML.UTILCLASS).removeClass(PureHTML.UTILCLASS);
+	},
 	
 	insert: function(self,index,text,attrs) {
 		var cn = self.childNodes, c, el;
@@ -1191,17 +1210,11 @@ var PureDom = {
 	},
 	
 	_trs: function(tagName,cells,attrs,firstHead,cellClasses) {
-		var t = this.element(tagName,attrs),i=0,subTagName = 'td', itemAttrs={},ats={},cell;
+		var t = this.element('tr',attrs),i=0,subTagName = 'td', itemAttrs={},ats={},cell;
 		if (!cells) {
 			cells = [];
 		}
 		if (cells.constructor === Array) {
-			switch (tagName) {
-				case 'thead':
-				case 'tfoot':
-					t = this.tr().to(t);
-					break;
-			}
 			var hasCellClasses = (cellClasses instanceof Array && cellClasses.length>0), c; 
 			if (cells && cells.length) {
 				for (; i< cells.length; i++) {
@@ -1228,7 +1241,13 @@ var PureDom = {
 				}
 			}
 		}
-		return t;
+		switch (tagName) {
+			case 'thead':
+			case 'tfoot':
+				return this.element(tagName,attrs).append(t);
+			default:
+				return t;
+		}
 	},
 	
 	tr: function(items,attrs,firstHead,cellClasses) {
@@ -1288,7 +1307,7 @@ var PureDom = {
 							t = c.text;
 						}
 					} else {
-						t = c;
+						t = header[i];
 					}
 					if (t) {
 						cellClasses.push(t.sanitize('-'));
