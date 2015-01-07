@@ -1192,7 +1192,16 @@ var PureDom = {
 	
 	_trs: function(tagName,cells,attrs,firstHead,cellClasses) {
 		var t = this.element(tagName,attrs),i=0,subTagName = 'td', itemAttrs={},ats={},cell;
+		if (!cells) {
+			cells = [];
+		}
 		if (cells.constructor === Array) {
+			switch (tagName) {
+				case 'thead':
+				case 'tfoot':
+					t = this.tr().to(t);
+					break;
+			}
 			var hasCellClasses = (cellClasses instanceof Array && cellClasses.length>0), c; 
 			if (cells && cells.length) {
 				for (; i< cells.length; i++) {
@@ -1212,7 +1221,7 @@ var PureDom = {
 						}
 					}
 					c = this.tcell(subTagName,cell,ats);
-					if (cellClasses.length > i) {
+					if (hasCellClasses && cellClasses.length > i) {
 						c.addClass(cellClasses[i]);
 					}
 					t.append(c);
@@ -1222,12 +1231,16 @@ var PureDom = {
 		return t;
 	},
 	
+	tr: function(items,attrs,firstHead,cellClasses) {
+		return this._trs('tr', items,attrs,firstHead,cellClasses);
+	},
+	
 	thead: function(items,attrs,cellClasses) {
 		return this._trs('thead', items,attrs,false,cellClasses);
 	},
 	
-	tr: function(items,attrs,firstHead,cellClasses) {
-		return this._trs('tr', items,attrs,firstHead,cellClasses);
+	tfoot: function(items,attrs,cellClasses) {
+		return this._trs('tfoot', items,attrs,false,cellClasses);
 	},
 	
 	tbody: function(rows,attrs,opts,cellClasses) {
@@ -1250,8 +1263,20 @@ var PureDom = {
 	
 	table: function(header, rows,attrs,opts) {
 		opts = this._addOpts(opts,{firstHead:false,oddEven:false,autoClasses:false});
-		var ta = this.element('table',attrs),cellClasses = [], c, t;
-		
+		var ta = this.element('table',attrs),cellClasses = [], footer = [], c, t;
+		if (header.constructor == Object) {
+			var hasFooter = header.hasOwnProperty('footer'),
+			hasHeader = header.hasOwnProperty('header');
+			if (hasFooter || hasHeader) {
+				headFoot = header;
+				if (hasHeader) {
+					header = headFoot.header;
+				}
+				if (hasFooter) {
+					footer = headFoot.footer;
+				}
+			}
+		}
 		if (header.constructor === Array) {
 			if (opts.autoClasses) {
 				for (var i in header) {
@@ -1274,6 +1299,9 @@ var PureDom = {
 		}
 		if (rows.constructor === Array) {
 			ta.append(this.tbody(rows,{},opts, cellClasses));
+		}
+		if (footer.constructor === Array) {
+			ta.append(this.tfoot(footer,{},cellClasses));
 		}
 		return ta;
 	},

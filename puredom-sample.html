@@ -99,7 +99,10 @@ var sidebarFirst = p.aside().setId("sidebar-first").to(main);
 							.to(content)
 							.insert(1,"Staplers");
 
-	var hCells = ["Name","Height","Width","Depth","Weight"];
+	var hCells = {
+		header: ["Name","Height","Width","Depth","Weight"],
+		footer: ["","99","67","24","9.2"],
+	};
 
 	var rows = [
 		["Toaster",22,33,19,0.7],
@@ -177,35 +180,9 @@ var sidebarFirst = p.aside().setId("sidebar-first").to(main);
 		p.list(plants).addClass("plants").to(content);
 		
 		p.article().to(content).append("<p>This is some literal HTML</p>");
-		
-		
-		console.log(content.first('table').matchClass(/th$/).addClass('bell'));
 
 
-		var cell = function(type,text,attrs) {
-			if (typeof type != 'string') {
-				type = 'td';
-			}
-			if (typeof text != 'string') {
-				text = '';
-			}
-			if (typeof attrs != 'object') {
-				attrs = {};
-			}
-			this.type = type;
-			this.text = text;
-			this.attrs = attrs;
-			this.attr = function(key) {
-				if (this.attrs.hasOwnProperty(key)) {
-					return this.attrs[key];
-				}
-				return '';
-			}
-		}
-		
-		var c = new cell('th', '16m',{"class":"height"});
 		p.setTitle("Sample Title");
-		console.log(c.attr('class'))
 
 }
 	

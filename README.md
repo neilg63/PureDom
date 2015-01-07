@@ -74,8 +74,8 @@ PureDom
 	<dt>.list(items,attrs)</dt>
 	<dd>Lets you build an unordered list (ul) with each item as a new list item (li) tag. The first parameter must be an array of either simple text strings, in which case no parameters are added, or JSON objects, in which case the "text" attribute serves as the text and other attributes are treated as attributes of each li tag.</dd>
 	
-	<dt>after(HTMLElement)</dt>
-	<dd>Inserts an HTML element before the referenced HTML Element.</dd>
+	<dt>.table(header,rows,attrs,opts)</dt>
+	<dd>Builds table from a array of header cells and two-dimensional array of rows. If you need a footer too, then add a simple object with header and footer key names containing arrays. Row cells may simple strings of Cell objects in which text maps to the cell content and .attrs maps to its attributes. You can you use the .get(index1,index2...) method to access individual cells by adding each nested index in successive parameters. Opts include odd/even rows, automatic class names based on header cell names.</dd>
 	
 </dl>
 

@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>PureDom HTML Builder Sample</title>
-<script src="PureDom.js"></script>
+<script src="http://multifaceted.info/demos/puredom/PureDom.min.js"></script>
 <link href="http://fonts.googleapis.com/css?family=Cabin:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
 <style>
 
@@ -155,7 +155,7 @@ section#main-content {
 			"us": "United States",
 			"za": "South Africa"
 		};
-		var sl = p.selectControl("country","Nearest poplulous country",opts,{id:"county-code"},"in").to(f);
+		var sl = p.selectControl("country","Nearest populous country",opts,{id:"county-code"},"in").to(f);
 	
 	
 		p.p("Quisque fringilla metus ac risus fermentum fermentum id cursus sapien. Nam id elit magna. Donec tincidunt eleifend sapien, eget adipiscing arcu facilisis eget. Proin velit quam, lobortis id tempus non, porttitor non velit. In rutrum mattis neque, at porttitor est iaculis at. ").to(f);
@@ -205,28 +205,30 @@ section#main-content {
 
 	/* PureDom v0.0.1 | Author: Neil Gardner, 2015 | License: MIT/GPL */
 
-window.onload = function() {
+document.addEventListener("DOMContentLoaded", function(event) { 
 
+	var p = PureDom;
 	var evalScript = function() {
-		document.body.first("#page").innerHTML = '';
-		eval(document.body.first("#script-tester").value);
+		document.getElementById("page").innerHTML = '';
+		var cd = document.getElementById("script-tester").value;
+		if (typeof cd == 'string') {
+			eval(cd);
+		}
 	}
 
 	HTMLElement.prototype.toBody = function() {
 		return this.to('#page');
 	}
 
-	var b = document.body;
-	b.first("#run-script").onclick = function(e) {
-		evalScript();
-		console.log('yu')
+	document.getElementById("run-script").onclick = function(e) {
 		e.preventDefault();
 		e.stopImmediatePropagation();
+		evalScript();
 	}
+	
+	setTimeout(evalScript,200);
 
-	evalScript();
-
-}
+});
 	
 </script>
 </body>
